@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Techop.id - Jasa Mobile App Developer Profesional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body class="bg-white">
+    <!-- Loading indicator -->
+    <div id="loading" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+      <div class="text-center">
+        <div class="loading mb-4"></div>
+        <p class="text-gray-600 font-medium">Loading components...</p>
+        <div class="text-xs text-gray-400 mt-2">TechOp Mobile Development</div>
+      </div>
+    </div>
+
+    <!-- Containers untuk setiap komponen -->
+    <div id="navbar-container"></div>
+    <div id="hero-container"></div>
+    <div id="technology-container"></div>
+    <div id="services-container"></div>
+    <div id="about-container"></div>
+    <div id="portfolio-container"></div>
+    <div id="pricing-container"></div>
+    <div id="clients-container"></div>
+    <div id="testimonials-container"></div>
+    <div id="blog-container"></div>
+    <div id="timeline-container"></div>
+    <div id="faq-container"></div>
+    <div id="outsourcing-container"></div>
+    <div id="team-container"></div>
+    <div id="footer-container"></div>
+    <script src="assets/js/script.js"></script>
+
+    <script>
+      // Configuration & Components Data
+      const CONFIG = { navbarHeight: 80, scrollOffset: 100, scrollSpeed: 2, autoScrollEnabled: true, debugMode: true };
+
+      const components = [
+        { name: "navbar", container: "navbar-container", path: "mobileapps/" },
+        { name: "hero", container: "hero-container", sectionId: "beranda", path: "mobileapps/" },
+        { name: "services", container: "services-container", sectionId: "layanan", path: "mobileapps/" },
+        { name: "about", container: "about-container", sectionId: "tentang", path: "mobileapps/" },
+        { name: "portfolio", container: "portfolio-container", sectionId: "portofolio", path: "mobileapps/" },
+        { name: "technology", container: "technology-container", sectionId: "teknologi", path: "mobileapps/" },
+        { name: "pricing", container: "pricing-container", sectionId: "harga", path: "mobileapps/" },
+        { name: "clients", container: "clients-container", sectionId: "clients", path: "mobileapps/" },
+        { name: "testimonials", container: "testimonials-container", sectionId: "testimonials", path: "mobileapps/" },
+        { name: "blog", container: "blog-container", sectionId: "blog", path: "mobileapps/" },
+        { name: "timeline", container: "timeline-container", sectionId: "timeline", path: "mobileapps/" },
+        { name: "faq", container: "faq-container", sectionId: "faq", path: "mobileapps/" },
+        { name: "team", container: "team-container", sectionId: "team", path: "mobileapps/" },
+        { name: "outsourcing", container: "outsourcing-container", sectionId: "outsourcing", path: "mobileapps/" },
+        { name: "footer", container: "footer-container", sectionId: "kontak", path: "mobileapps/" },
+      ];
+
+      // Utility Functions
+      const log = (msg, type = "info") => CONFIG.debugMode && console.log(`${{ info: "📘", success: "✅", warning: "⚠️", error: "❌", loading: "🔄" }[type]} ${msg}`);
+      const debounce = (func, wait) => {
+        let timeout;
+        return (...args) => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func(...args), wait);
+        };
+      };
+
+      // Component Loader - Optimized
+      const ComponentLoader = {
+        async loadComponent(name, containerId) {
+          try {
+            log(`Loading ${name}...`, "loading");
+            const response = await fetch(`mobileapps/${name}.html`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+            const html = await response.text();
+            const container = document.getElementById(containerId);
+            if (!container) throw new Error(`Container ${containerId} not found`);
+
+            container.innerHTML = html;
+
+            // Initialize component-specific functionality immediately
+            this.initializeComponentScript(name, container);
+
+            log(`${name} loaded successfully`, "success");
+            return true;
+          } catch (error) {
+            log(`Error loading ${name}: ${error.message}`, "error");
+            const container = document.getElementById(containerId);
+            if (container) {
+              container.innerHTML = `
+                <div class="text-center text-red-500 p-4 border border-red-200 rounded-lg">
+                  <i class="fas fa-exclamation-triangle mb-2"></i>
+                  <p class="font-semibold">Error loading ${name} component</p>
+                  <p class="text-sm">${error.message}</p>
+                  <button onclick="ComponentLoader.retryComponent('${name}', '${containerId}')" 
+                          class="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">
+                    Retry
+                  </button>
+                </div>`;
+            }
+            return false;
+          }
+        },
+
+        initializeComponentScript(name, container) {
+          // Execute scripts immediately
+          const scripts = container.querySelectorAll("script");
+          for (const script of scripts) {
+            try {
+              if (script.src) {
+                this.loadExternalScript(script.src);
+              } else {
+                const scriptContent = script.innerHTML;
+                if (scriptContent.trim()) {
+                  const newScript = document.createElement("script");
+                  newScript.innerHTML = scriptContent;
+                  document.head.appendChild(newScript);
+                  document.head.removeChild(newScript);
+                }
+              }
+            } catch (error) {
+              log(`Error executing script in ${name}: ${error.message}`, "warning");
+            }
+          }
+
+          // Special handling for portfolio component - immediate initialization
+          if (name === "portfolio") {
+            this.initializePortfolioComponent(container);
+          } else if (name === "faq") {
+            // Special handling for FAQ component
+            setTimeout(() => {
+              if (typeof window.initializeFAQComponent === "function") {
+                try {
+                  window.initializeFAQComponent();
+                  log("FAQ component initialized", "success");
+                } catch (error) {
+                  log(`Error initializing FAQ: ${error.message}`, "error");
+                }
+              }
+            }, 200);
+          }
+        },
+
+        async loadExternalScript(src) {
+          return new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+        },
+
+        initializePortfolioComponent(container) {
+          // Immediate initialization without timeout
+          if (typeof initializePortfolioComponent === "function") {
+            try {
+              initializePortfolioComponent();
+              log("Portfolio component initialized", "success");
+            } catch (error) {
+              log(`Error initializing portfolio: ${error.message}`, "error");
+            }
+          } else {
+            this.fallbackPortfolioInit(container);
+          }
+        },
+
+        fallbackPortfolioInit(container) {
+          log("Using fallback portfolio initialization", "warning");
+
+          const filterBtns = container.querySelectorAll(".filter-btn");
+          const portfolioItems = container.querySelectorAll(".portfolio-item");
+
+          if (filterBtns.length === 0 || portfolioItems.length === 0) {
+            log("Portfolio elements not found for fallback init", "warning");
+            return;
+          }
+
+          filterBtns.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              // Remove active class from all buttons
+              filterBtns.forEach((b) => {
+                b.classList.remove("active");
+                const dot = b.querySelector(".filter-dot");
+                const text = b.querySelector("span");
+                if (dot && text) {
+                  dot.style.backgroundColor = "#d1d5db";
+                  text.style.color = "#374151";
+                  text.style.fontWeight = "normal";
+                }
+              });
+
+              // Add active class to clicked button
+              btn.classList.add("active");
+              const activeDot = btn.querySelector(".filter-dot");
+              const activeText = btn.querySelector("span");
+              if (activeDot && activeText) {
+                activeDot.style.backgroundColor = "#2563eb";
+                activeText.style.color = "#2563eb";
+                activeText.style.fontWeight = "600";
+              }
+
+              const filter = btn.getAttribute("data-filter");
+
+              // Filter items immediately without delay
+              portfolioItems.forEach((item) => {
+                const category = item.getAttribute("data-category");
+                if (filter === "all" || category === filter) {
+                  item.style.display = "block";
+                  item.classList.add("fade-in");
+                } else {
+                  item.classList.remove("fade-in");
+                  item.style.display = "none";
+                }
+              });
+            });
+          });
+
+          log("Fallback portfolio initialization complete", "success");
+        },
+
+        async retryComponent(name, containerId) {
+          log(`Retrying ${name}...`, "loading");
+          const success = await this.loadComponent(name, containerId, 'mobileapps/');
+          if (success) {
+            // Initialize immediately
+            SectionManager.ensureSectionIds();
+            NavigationManager.initializeNavigation();
+          }
+        },
+
+        async loadAllComponents() {
+          log("Starting to load all components...", "loading");
+          try {
+            // Load components in parallel for faster loading
+            const results = await Promise.all(components.map((comp) => this.loadComponent(comp.name, comp.container, comp.path)));
+            const successCount = results.filter(Boolean).length;
+            log(`${successCount}/${components.length} components loaded successfully`, "success");
+
+            const loading = document.getElementById("loading");
+            if (loading) loading.style.display = "none";
+
+            // Initialize all systems immediately
+            SectionManager.ensureSectionIds();
+            NavigationManager.initializeNavigation();
+            AutoScrollManager.initialize();
+            LazyLoadManager.initialize();
+
+            return true;
+          } catch (error) {
+            log(`Error loading components: ${error.message}`, "error");
+            const loading = document.getElementById("loading");
+            if (loading) {
+              loading.innerHTML = `
+                <div class="text-center text-red-500 p-4">
+                  <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                  <p class="font-semibold">❌ Error loading components</p>
+                  <p class="text-sm mb-4">${error.message}</p>
+                  <button onclick="ComponentLoader.loadAllComponents()" 
+                          class="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                    Retry All
+                  </button>
+                </div>`;
+            }
+            return false;
+          }
+        },
+      };
+
+      // Section Manager
+      const SectionManager = {
+        ensureSectionIds() {
+          log("Ensuring section IDs...", "loading");
+          components.forEach((comp) => {
+            if (!comp.sectionId) return;
+            const container = document.getElementById(comp.container);
+            if (!container) return;
+
+            let section = document.getElementById(comp.sectionId);
+            if (!section) {
+              section = container.querySelector("section") || container.querySelector(".section") || container.querySelector("[data-section]") || container.firstElementChild;
+              if (section) {
+                section.setAttribute("id", comp.sectionId);
+                log(`Added ID "${comp.sectionId}" to section`, "success");
+              } else {
+                const wrapper = document.createElement("section");
+                wrapper.id = comp.sectionId;
+                wrapper.className = "section-wrapper";
+                while (container.firstChild) wrapper.appendChild(container.firstChild);
+                container.appendChild(wrapper);
+                log(`Created wrapper section for "${comp.sectionId}"`, "success");
+              }
+            }
+          });
+        },
+
+        getAllSections() {
+          return components
+            .filter((comp) => comp.sectionId)
+            .map((comp) => ({ id: comp.sectionId, element: document.getElementById(comp.sectionId), container: comp.container }))
+            .filter((section) => section.element);
+        },
+      };
+
+      // Navigation Manager - Optimized
+      const NavigationManager = {
+        activeLink: null,
+        sections: [],
+
+        initializeNavigation() {
+          log("Initializing navigation system...", "loading");
+          this.sections = SectionManager.getAllSections();
+          this.initializeMobileMenu();
+          this.initializeSmoothScrolling();
+          this.initializeActiveHighlight();
+          this.initializeKeyboardNavigation();
+          log("Navigation system initialized", "success");
+        },
+
+        initializeMobileMenu() {
+          const navToggle = document.getElementById("navToggle") || document.querySelector("[data-nav-toggle]") || document.querySelector(".nav-toggle") || document.querySelector(".mobile-menu-btn");
+          const mobileMenu = document.getElementById("mobileMenu") || document.querySelector("[data-mobile-menu]") || document.querySelector(".mobile-menu") || document.querySelector(".nav-mobile");
+
+          if (navToggle && mobileMenu) {
+            navToggle.addEventListener("click", (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const isHidden = mobileMenu.classList.contains("hidden") || mobileMenu.style.display === "none";
+              if (isHidden) {
+                mobileMenu.classList.remove("hidden");
+                mobileMenu.style.display = "block";
+                navToggle.setAttribute("aria-expanded", "true");
+              } else {
+                mobileMenu.classList.add("hidden");
+                mobileMenu.style.display = "none";
+                navToggle.setAttribute("aria-expanded", "false");
+              }
+              log("Mobile menu toggled", "info");
+            });
+
+            document.addEventListener("click", (e) => {
+              if (!navToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+                mobileMenu.classList.add("hidden");
+                mobileMenu.style.display = "none";
+                navToggle.setAttribute("aria-expanded", "false");
+              }
+            });
+            log("Mobile menu initialized", "success");
+          }
+        },
+
+        initializeSmoothScrolling() {
+          const navLinks = document.querySelectorAll('a[href^="#"], [data-scroll-to]');
+          navLinks.forEach((link) => {
+            link.addEventListener("click", (e) => {
+              e.preventDefault();
+              const targetId = link.getAttribute("href") || link.getAttribute("data-scroll-to");
+              if (!targetId || targetId === "#") return;
+              const targetElement = document.querySelector(targetId);
+              if (targetElement) {
+                this.scrollToElement(targetElement, targetId);
+                this.closeMobileMenu();
+              } else {
+                log(`Target element ${targetId} not found`, "warning");
+              }
+            });
+          });
+          log(`Smooth scrolling initialized for ${navLinks.length} links`, "success");
+        },
+
+        scrollToElement(element, targetId) {
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - CONFIG.navbarHeight;
+          window.scrollTo({ top: Math.max(0, offsetPosition), behavior: "smooth" });
+          log(`Scrolling to ${targetId}`, "info");
+          if (history.pushState) history.pushState(null, null, targetId);
+        },
+
+        closeMobileMenu() {
+          const mobileMenu = document.getElementById("mobileMenu") || document.querySelector("[data-mobile-menu]") || document.querySelector(".mobile-menu");
+          const navToggle = document.getElementById("navToggle") || document.querySelector("[data-nav-toggle]");
+          if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
+            mobileMenu.classList.add("hidden");
+            if (navToggle) navToggle.setAttribute("aria-expanded", "false");
+          }
+        },
+
+        initializeActiveHighlight() {
+          if (this.sections.length === 0) return;
+          const updateActiveNav = debounce(() => {
+            let current = "";
+            const scrollPosition = window.scrollY + CONFIG.scrollOffset;
+            for (let i = this.sections.length - 1; i >= 0; i--) {
+              const section = this.sections[i];
+              if (!section.element) continue;
+              const sectionTop = section.element.offsetTop;
+              if (scrollPosition >= sectionTop - 50) {
+                current = section.id;
+                break;
+              }
+            }
+            this.updateActiveLinks(current);
+          }, 5); // Reduced debounce time for responsiveness
+          window.addEventListener("scroll", updateActiveNav, { passive: true });
+          updateActiveNav();
+          log("Active navigation highlighting initialized", "success");
+        },
+
+        updateActiveLinks(currentSectionId) {
+          if (this.activeLink === currentSectionId) return;
+          const navLinks = document.querySelectorAll('a[href^="#"], [data-scroll-to]');
+          navLinks.forEach((link) => {
+            const href = link.getAttribute("href") || link.getAttribute("data-scroll-to");
+            const isActive = href === `#${currentSectionId}`;
+            link.classList.remove("active", "nav-active", "text-blue-600", "text-blue-500", "border-b-2", "border-blue-600", "border-blue-500", "bg-blue-100", "font-semibold");
+            if (isActive) {
+              link.classList.add("active", "text-blue-600", "font-semibold");
+              if (!link.closest(".mobile-menu")) {
+                link.classList.add("border-b-2", "border-blue-600");
+              } else {
+                link.classList.add("bg-blue-100");
+              }
+            }
+          });
+          this.activeLink = currentSectionId;
+        },
+
+        initializeKeyboardNavigation() {
+          document.addEventListener("keydown", (e) => {
+            if (e.altKey && e.key >= "1" && e.key <= "9") {
+              e.preventDefault();
+              const index = parseInt(e.key) - 1;
+              if (this.sections[index]) this.scrollToElement(this.sections[index].element, this.sections[index].id);
+            }
+            if (e.key === "Escape") this.closeMobileMenu();
+          });
+        },
+      };
+
+      // Auto Scroll Manager - Optimized
+      const AutoScrollManager = {
+        container: null,
+        isScrolling: false,
+        scrollDirection: 1,
+        animationFrame: null,
+
+        initialize() {
+          if (!CONFIG.autoScrollEnabled) return;
+          this.container = document.getElementById("auto-scroll-container") || document.querySelector("[data-auto-scroll]") || document.querySelector(".auto-scroll");
+          if (this.container) {
+            this.startAutoScroll();
+            this.initializeScrollControls();
+            log("Auto-scroll initialized", "success");
+          }
+        },
+
+        startAutoScroll() {
+          if (!this.container) return;
+          const scroll = () => {
+            if (!this.isScrolling) return;
+            this.container.scrollLeft += this.scrollDirection * CONFIG.scrollSpeed;
+            if (this.container.scrollLeft + this.container.clientWidth >= this.container.scrollWidth) this.scrollDirection = -1;
+            if (this.container.scrollLeft <= 0) this.scrollDirection = 1;
+            this.animationFrame = requestAnimationFrame(scroll);
+          };
+          this.isScrolling = true;
+          this.animationFrame = requestAnimationFrame(scroll);
+        },
+
+        stopAutoScroll() {
+          this.isScrolling = false;
+          if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+          }
+        },
+
+        initializeScrollControls() {
+          if (!this.container) return;
+          this.container.addEventListener("mouseenter", () => this.stopAutoScroll());
+          this.container.addEventListener("mouseleave", () => this.startAutoScroll());
+          this.container.addEventListener("touchstart", () => this.stopAutoScroll());
+          this.container.addEventListener("touchend", () => this.startAutoScroll()); // Immediate restart
+        },
+      };
+
+      // Lazy Load Manager - Enhanced
+      const LazyLoadManager = {
+        observer: null,
+
+        initialize() {
+          if (!("IntersectionObserver" in window)) return;
+          this.observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  this.loadElement(entry.target);
+                  this.observer.unobserve(entry.target);
+                }
+              });
+            },
+            { threshold: 0.1, rootMargin: "100px" } // Increased preload distance
+          );
+
+          document.querySelectorAll("[data-lazy], .lazy").forEach((element) => this.observer.observe(element));
+          log("Lazy loading initialized", "success");
+        },
+
+        loadElement(element) {
+          if (element.dataset.src) {
+            element.src = element.dataset.src;
+            element.removeAttribute("data-src");
+          }
+          if (element.dataset.bg) {
+            element.style.backgroundImage = `url(${element.dataset.bg})`;
+            element.removeAttribute("data-bg");
+          }
+          element.classList.add("loaded");
+        },
+      };
+
+      // Error Handler
+      const ErrorHandler = {
+        initialize() {
+          window.addEventListener("error", (e) => log(`JavaScript error: ${e.message}`, "error"));
+          window.addEventListener("unhandledrejection", (e) => log(`Unhandled promise rejection: ${e.reason}`, "error"));
+        },
+
+        showUserError(message, action = null) {
+          const errorDiv = document.createElement("div");
+          errorDiv.className = "fixed top-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg z-50";
+          errorDiv.innerHTML = `
+            <div class="flex items-center gap-2">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>${message}</span>
+              ${action ? `<button onclick="${action}" class="ml-2 px-2 py-1 bg-red-700 rounded text-sm">Retry</button>` : ""}
+              <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-red-200 hover:text-white">×</button>
+            </div>`;
+          document.body.appendChild(errorDiv);
+          setTimeout(() => errorDiv.parentElement && errorDiv.remove(), 5000);
+        },
+      };
+
+      // Main Application
+      const App = {
+        async initialize() {
+          log("🚀 Initializing Techop.id Application...", "loading");
+          try {
+            ErrorHandler.initialize();
+            const success = await ComponentLoader.loadAllComponents();
+            if (success) {
+              log("🎉 Application initialized successfully!", "success");
+            } else {
+              throw new Error("Failed to load some components");
+            }
+          } catch (error) {
+            log(`Failed to initialize application: ${error.message}`, "error");
+            ErrorHandler.showUserError("Gagal memuat halaman. Silakan coba lagi.", "App.initialize()");
+          }
+        },
+      };
+
+      // Event Listeners
+      document.addEventListener("DOMContentLoaded", () => {
+        log("📄 DOM loaded, starting application...", "info");
+        App.initialize();
+      });
+
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          const loading = document.getElementById("loading");
+          if (loading && loading.style.display !== "none") {
+            loading.innerHTML = `
+              <div class="text-center text-amber-600 p-6">
+                <i class="fas fa-clock text-3xl mb-4"></i>
+                <p class="text-lg font-semibold">⚠️ Komponen membutuhkan waktu lebih lama</p>
+                <p class="text-sm mb-4">Pastikan folder components tersedia dan berisi file HTML</p>
+                <button onclick="location.reload()" 
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <i class="fas fa-redo mr-2"></i>Muat Ulang
+                </button>
+              </div>`;
+          }
+        }, 3000); // Reduced timeout
+      });
+
+      // Debug mode exposure
+      if (CONFIG.debugMode) {
+        window.TechopApp = { App, ComponentLoader, NavigationManager, SectionManager, AutoScrollManager, CONFIG };
+      }
+
+      // Module export support
+      if (typeof module !== "undefined" && module.exports) {
+        module.exports = { App, ComponentLoader, NavigationManager };
+      }
+    </script>
+  </body>
+</html>
