@@ -50,6 +50,19 @@
                         <i class="fas fa-arrow-left mr-2"></i>
                         Kembali
                     </button>
+                    <script>
+                        // Fallback untuk tombol kembali jika history kosong
+                        document.querySelectorAll('button[onclick*="history.back"]').forEach(function(btn) {
+                            btn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                if (window.history.length > 1) {
+                                    window.history.back();
+                                } else {
+                                    window.location.href = '/'; // fallback ke halaman utama
+                                }
+                            });
+                        });
+                    </script>
                     <div class="h-6 border-l border-gray-300"></div>
                     <h1 class="text-xl font-semibold text-gray-800">Harga Khusus Mahasiswa</h1>
                 </div>
@@ -98,19 +111,19 @@
                 <!-- Student Basic -->
                 <div class="bg-white rounded-2xl p-8 card-shadow relative overflow-hidden">
                     <div class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                        HEMAT 50%
+                        HEMAT 40%
                     </div>
                     <div class="text-center mb-6">
                         <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-laptop-code text-blue-600 text-2xl"></i>
                         </div>
                         <h3 class="text-2xl font-bold mb-2">Student Basic</h3>
-                        <p class="text-gray-600 text-sm">Perfect untuk tugas kuliah dan portofolio sederhana</p>
+                        <p class="text-gray-600 text-sm">Aplikasi sederhana, tugas kuliah, landing page, portofolio</p>
                     </div>
 
                     <div class="text-center mb-6">
-                        <div class="text-gray-400 text-lg line-through mb-1">Rp 2.500.000</div>
-                        <div class="text-4xl font-bold text-blue-600 mb-2">Rp 1.250.000</div>
+                        <div class="text-gray-400 text-lg line-through mb-1">Rp 500.000</div>
+                        <div class="text-4xl font-bold text-blue-600 mb-2">Rp 300.000</div>
                         <div class="text-sm text-gray-600">Sekali bayar</div>
                     </div>
 
@@ -125,7 +138,7 @@
                         </li>
                         <li class="flex items-center gap-2">
                             <i class="fas fa-check text-green-500"></i>
-                            <span>Domain + Hosting 6 Bulan</span>
+                            <span>Domain + Hosting 3 Bulan</span>
                         </li>
                         <li class="flex items-center gap-2">
                             <i class="fas fa-check text-green-500"></i>
@@ -141,7 +154,7 @@
                         </li>
                     </ul>
 
-                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors" onclick="orderPackage('Student Basic', '1.250.000')">
+                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors" onclick="orderPackage('Student Basic', '300.000')">
                         Pilih Paket Ini
                     </button>
                 </div>
@@ -152,7 +165,7 @@
                         ⭐ MOST POPULAR
                     </div>
                     <div class="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                        HEMAT 60%
+                        HEMAT 50%
                     </div>
                     
                     <div class="text-center mb-6 mt-4">
@@ -160,12 +173,12 @@
                             <i class="fas fa-rocket text-white text-2xl"></i>
                         </div>
                         <h3 class="text-2xl font-bold mb-2">Student Pro</h3>
-                        <p class="text-white text-opacity-90 text-sm">Ideal untuk project akhir dan portofolio profesional</p>
+                        <p class="text-white text-opacity-90 text-sm">Aplikasi web, domain, hosting, project akhir, skripsi</p>
                     </div>
 
                     <div class="text-center mb-6">
-                        <div class="text-white text-opacity-60 text-lg line-through mb-1">Rp 8.500.000</div>
-                        <div class="text-4xl font-bold mb-2">Rp 3.400.000</div>
+                        <div class="text-white text-opacity-60 text-lg line-through mb-1">Rp 1.000.000</div>
+                        <div class="text-4xl font-bold mb-2">Rp 500.000</div>
                         <div class="text-sm text-white text-opacity-80">Sekali bayar</div>
                     </div>
 
@@ -188,7 +201,7 @@
                         </li>
                         <li class="flex items-center gap-2">
                             <i class="fas fa-check text-yellow-400"></i>
-                            <span>Domain + Hosting 1 Tahun</span>
+                            <span>Domain + Hosting 6 Bulan</span>
                         </li>
                         <li class="flex items-center gap-2">
                             <i class="fas fa-check text-yellow-400"></i>
@@ -204,7 +217,7 @@
                         </li>
                     </ul>
 
-                    <button class="w-full bg-white text-purple-600 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors" onclick="orderPackage('Student Pro', '3.400.000')">
+                    <button class="w-full bg-white text-purple-600 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors" onclick="orderPackage('Student Pro', '500.000')">
                         Pilih Paket Ini
                     </button>
                 </div>
@@ -212,26 +225,26 @@
                 <!-- Student Ultimate -->
                 <div class="bg-white rounded-2xl p-8 card-shadow relative overflow-hidden">
                     <div class="absolute top-4 right-4 bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                        HEMAT 55%
+                        HEMAT 60%
                     </div>
                     <div class="text-center mb-6">
                         <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-crown text-purple-600 text-2xl"></i>
                         </div>
-                        <h3 class="text-2xl font-bold mb-2">Student Ultimate</h3>
-                        <p class="text-gray-600 text-sm">Untuk mahasiswa yang ingin project advanced</p>
+                        <h3 class="text-2xl font-bold mb-2">Student Ultimate (Skripsi/Web)</h3>
+                        <p class="text-gray-600 text-sm">Layanan skripsi, tugas akhir, aplikasi web, mobile, cloud, mentor, free revisi</p>
                     </div>
 
                     <div class="text-center mb-6">
-                        <div class="text-gray-400 text-lg line-through mb-1">Rp 25.000.000</div>
-                        <div class="text-4xl font-bold text-purple-600 mb-2">Rp 11.250.000</div>
-                        <div class="text-sm text-gray-600">Atau cicil 6x</div>
+                        <div class="text-gray-400 text-lg line-through mb-1">Rp 7.500.000</div>
+                        <div class="text-4xl font-bold text-purple-600 mb-2">Rp 3.000.000</div>
+                        <div class="text-sm text-gray-600">Free revisi & bisa cicil 3x</div>
                     </div>
 
                     <ul class="space-y-3 mb-8 text-sm">
                         <li class="flex items-center gap-2">
                             <i class="fas fa-check text-green-500"></i>
-                            <span>Full Custom Development</span>
+                            <span>Full Custom Development (Web/Skripsi)</span>
                         </li>
                         <li class="flex items-center gap-2">
                             <i class="fas fa-check text-green-500"></i>
@@ -257,9 +270,13 @@
                             <i class="fas fa-check text-green-500"></i>
                             <span>Career Guidance</span>
                         </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>Free revisi sampai ACC dosen</span>
+                        </li>
                     </ul>
 
-                    <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold transition-colors" onclick="orderPackage('Student Ultimate', '11.250.000')">
+                    <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold transition-colors" onclick="orderPackage('Student Ultimate (Skripsi/Web)', '3.000.000')">
                         Pilih Paket Ini
                     </button>
                 </div>
@@ -372,42 +389,6 @@
                         <div class="text-2xl font-bold text-green-600">Barter</div>
                         <div class="text-sm text-gray-500">sesuai skill dan availability</div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Success Stories -->
-    <section class="bg-white py-16">
-        <div class="container mx-auto px-6">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">Success Stories Mahasiswa</h2>
-                <p class="text-gray-600">Beberapa mahasiswa yang sudah berhasil dengan bantuan TechOp</p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-6 text-center">
-                    <img src="assets/img/alya.jpg" alt="Alya" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover">
-                    <h3 class="font-bold text-lg mb-2">Alya Putri</h3>
-                    <p class="text-sm text-gray-600 mb-3">Teknik Informatika - Universitas Indonesia</p>
-                    <p class="text-sm italic">"Website portofolio dari TechOp membantu saya dapat internship di startup unicorn!"</p>
-                    <div class="mt-4 text-blue-600 font-semibold">Web Developer Intern at Gojek</div>
-                </div>
-
-                <div class="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 text-center">
-                    <img src="assets/img/andi.jpg" alt="Andi" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover">
-                    <h3 class="font-bold text-lg mb-2">Andi Rahman</h3>
-                    <p class="text-sm text-gray-600 mb-3">Sistem Informasi - ITB</p>
-                    <p class="text-sm italic">"Project akhir saya dapat nilai A berkat guidance dari tim TechOp. Terima kasih!"</p>
-                    <div class="mt-4 text-green-600 font-semibold">Full-stack Developer at Tokopedia</div>
-                </div>
-
-                <div class="bg-gradient-to-br from-purple-50 to-violet-100 rounded-2xl p-6 text-center">
-                    <img src="assets/img/wira.jpg" alt="Wira" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover">
-                    <h3 class="font-bold text-lg mb-2">Wira Saputra</h3>
-                    <p class="text-sm text-gray-600 mb-3">Desain Komunikasi Visual - Binus</p>
-                    <p class="text-sm italic">"Dari zero coding jadi bisa bikin aplikasi mobile sendiri. Amazing experience!"</p>
-                    <div class="mt-4 text-purple-600 font-semibold">UI/UX Designer at Shopee</div>
                 </div>
             </div>
         </div>
